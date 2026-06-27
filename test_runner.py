@@ -28,8 +28,6 @@ def test_classification_accuracy():
     from src.acquisition.synthetic_generator import generate_demo_science_batch
 
     pipeline = TransitAIPipeline()
-    # Force rule-based fallback to ensure instant verification
-    pipeline.classifier.is_trained = False
     
     batch = generate_demo_science_batch(50)  # use 50 for speed
     correct = 0
@@ -43,8 +41,8 @@ def test_classification_accuracy():
         if r.get('classification', {}).get('label') == item.get('true_label'):
             correct += 1
     accuracy = correct / len(batch)
-    logger.info(f"Classification accuracy: {accuracy:.1%} (need >= 5%)")
-    assert accuracy >= 0.05, f"Accuracy too low: {accuracy:.1%}"
+    logger.info(f"Classification accuracy: {accuracy:.1%} (need >= 50%)")
+    assert accuracy >= 0.50, f"Accuracy too low: {accuracy:.1%}"
     print("Classification accuracy test PASSED")
 
 def test_report_generation():
