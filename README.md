@@ -1,5 +1,5 @@
-# 🌌 AstroLens AI: Production Exoplanet Detection Platform
-### ISRO ANTARIKSH Hackathon · Problem Statement 7 · Advanced Production Release
+# 🪐 TRANSIT-AI: AI-Enabled Detection of Exoplanets from Noisy Astronomical Light Curves
+### A Production-Grade, High-Performance Platform for Automatic Transit Discovery, Parameter Estimation, and False Positive Vetting
 
 ---
 
@@ -12,27 +12,35 @@
 
 ---
 
-## 🌟 What We Engineered (v2.0 Architectural Enhancements)
+## 🌟 The Scientific Challenge & Our Solution
 
-We extended the basic transit detection script into a robust, high-throughput, and scientifically accurate **Exoplanet Discovery & Vetting Platform**. 
+Exoplanet detection via transit photometry requires identifying extremely small periodic brightness drops in stars. In crowded stellar fields or low-SNR regimes, these signatures are heavily corrupted by stellar blending, detector response systematics, and astrophysical false positives (such as eclipsing binaries).
 
-Here is a summary of the advanced components added to the repository:
+**TRANSIT-AI** solves this by providing a unified pipeline that automatically cleans, detrends, detects, models, and classifies candidates:
 
-### 1. 🧹 Deep Space Signal Preprocessing Pipeline
-* **TESS Quality Flags (`quality_flags.py`)**: Automatic cadence bitmask parsing to filter instrument jitter, coarse pointing, and momentum dumps.
-* **Robust Noise Filters (`outlier_removal.py`)**: Integrates Median Absolute Deviation (MAD) limits, single-cadence cosmic-ray spike removal, and multi-iteration sigma clipping.
-* **Adaptive Normalization (`normalization.py`)**: Supports Median, IQR, and Percentile-based flux scaling.
+1. **Clean & Prep**: Filters raw light curves using TESS bitmasks (`quality_flags.py`), MAD outlier removal (`outlier_removal.py`), and Wotan detrending (`detrending.py`).
+2. **Detect Dips**: Runs high-performance Transit Least Squares (TLS) and fixed-grid BLS searches to discover period candidates (`tls_detector.py`).
+3. **Vet Contaminants**: Uses secondary eclipse searches at phase 0.5 and odd-even transit depth mismatches to isolate eclipsing binaries (`secondary_eclipse.py`).
+4. **Keplerian Modeling**: Fits transits using `batman` models to estimate transit depth, duration, and midpoint (`batman_fitter.py`).
+5. **Ensemble ML Classification**: Classifies candidates into 5 cohorts (Transit, Eclipse, Blend, Stellar Var, Artifact) using a calibrated Random Forest + XGBoost Voting Ensemble (`ml_classifier.py`) and a 1D Convolutional Neural Network (`cnn_classifier.py`).
+6. **Habitability Characterization**: Calculates planet radius, semi-major axis, stellar irradiation, and habitable zone bounds (`habitability.py`).
+7. **External Cross-Matching**: Automatically matches candidate coordinates online against the **NASA Exoplanet Archive** databases (`cross_match.py`).
 
-### 2. 🔍 Stellar Companion & False Positive Vetting
-* **Eclipsing Binary Diagnostic (`secondary_eclipse.py`)**: Scans phase folds at 0.5 offset to flag secondary stellar eclipses, and implements odd-even transit depth mismatch vetting to filter background eclipsing binaries (EBs).
-* **Cross-Matching Engine (`cross_match.py`)**: Integrates online TAP query interfaces to verify candidate coordinates and periods against the **NASA Exoplanet Archive** databases.
+---
 
-### 3. 🌡️ Habitable Zone (HZ) Characterization
-* **Keplerian Estimator (`habitability.py`)**: Computes semi-major axis (AU), equilibrium temperature ($T_{eq}$), stellar irradiation flux, and classifies planets into size cohorts (Hot Jupiter, Super Earth, Earth-like).
+## ⚙️ Core Modes of Operation
 
-### 4. 🚀 High-Performance REST API Backend
-* **FastAPI Server (`main.py`)**: Production-ready service hosting `/predict`, `/upload` (CSV parsing), `/results`, and `/sky-map` endpoints.
-* **Background Worker Queue (`worker.py`)**: Enables scalable asynchronous batch processing of large stellar catalogs.
+The platform operates in two distinct modes configured via command-line arguments or environmental settings:
+
+### 1. 🧪 Synthetic Simulation Mode (`--mode synthetic`)
+* **Purpose**: Local pipeline validation, synthetic dataset generation, and model training.
+* **Mechanism**: Generates light curves programmatically. Models transit shapes via Batman, and injects realistic noise profiles (Gaussian noise, red noise, rotational variability, stellar flares, and instrument glitches).
+* **Ideal for**: Benchmarking classification accuracy, debugging, and training classifier checkpoints without dependency on network interfaces.
+
+### 🔭 Real MAST Ingestion Mode (`--mode mast`)
+* **Purpose**: Production exoplanet discovery on real space telescope data.
+* **Mechanism**: Leverages the STScI MAST API cone searches to identify targets (e.g., TESS 2-minute cadence targets) based on coordinates or TIC ID, retrieves FITS arrays, and feeds the raw timeseries directly into the preprocessing engine.
+* **Ideal for**: Cross-referencing new exoplanet candidates against known NASA catalogs and scanning target sectors.
 
 ---
 
@@ -73,14 +81,14 @@ TRASIT-AI/
 
 ### Option A: Local Run
 ```bash
-# Install package
+# Install dependencies
 pip install -r requirements.txt
 pip install -e .
 
-# Run Dashboard
+# Run Dashboard UI
 streamlit run app/streamlit_app.py
 
-# Run API Server
+# Run FastAPI Server
 uvicorn app.api.main:app --port 8000 --reload
 ```
 
