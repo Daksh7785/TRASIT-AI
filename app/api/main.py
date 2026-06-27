@@ -1,3 +1,4 @@
+# API Entrypoints for TRANSIT-AI exoplanet detection platform
 import os
 import sys
 import numpy as np
