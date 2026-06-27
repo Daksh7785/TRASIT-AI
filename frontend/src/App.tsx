@@ -30,8 +30,35 @@ const METRICS_TREND = [
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("landing");
-  const [candidates] = useState(INITIAL_CANDIDATES);
+  const [candidates, setCandidates] = useState(INITIAL_CANDIDATES);
   const [selectedCandidate, setSelectedCandidate] = useState<any>(INITIAL_CANDIDATES[0]);
+
+  // Fetch real exoplanet candidates from FastAPI backend on mount
+  useEffect(() => {
+    fetch("http://localhost:8000/sky-map")
+      .then(res => res.json())
+      .then(data => {
+        if (data.candidates && data.candidates.length > 0) {
+          const mapped = data.candidates.map((c: any, idx: number) => ({
+            id: c.tic_id,
+            name: c.tic_id.startsWith("SYN_") ? `Candidate ${idx}` : c.tic_id,
+            mission: "TESS",
+            period: c.period || 5.0,
+            depth: c.depth || 1000,
+            duration: 2.5,
+            confidence: c.confidence || 0.9,
+            status: c.confidence > 0.9 ? "Confirmed" : "Needs Review",
+            ra: c.ra || (10 + idx * 50),
+            dec: c.dec || (-30 + idx * 20)
+          }));
+          setCandidates(mapped);
+          setSelectedCandidate(mapped[0]);
+        }
+      })
+      .catch(err => {
+        console.log("FastAPI backend is offline, running in offline standalone simulation mode.", err);
+      });
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
