@@ -1,3 +1,4 @@
+# Production Release v2.0 - Optimized Outlier Filtering Pipeline
 """
 Outlier Removal Methods
 Multiple strategies for photometric outlier removal.
