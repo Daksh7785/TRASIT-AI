@@ -1,3 +1,4 @@
+# Production Release v2.0 - Eclipsing Binary Diagnostics
 """
 Secondary Eclipse Detection
 Tests for secondary eclipse at phase 0.5 offset.
