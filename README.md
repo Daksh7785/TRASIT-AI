@@ -28,6 +28,50 @@ Exoplanet detection via transit photometry requires identifying extremely small 
 
 ---
 
+## 📊 Model Workflow & Architecture Diagram
+
+```mermaid
+graph TD
+    %% Input Data
+    Input[Preprocessed Light Curve] --> FeatureExtract[Feature Engineering Module]
+    Input --> FoldGrid[Phase Fold Grid Interpolator]
+
+    %% Feature Path
+    subgraph Feature Ensemble Pathway
+        FeatureExtract -->|14 extracted stats & shape features| XGB[XGBoost Classifier]
+        FeatureExtract -->|14 extracted stats & shape features| RF[Random Forest Classifier]
+        XGB -->|Probabilities| Ensemble[Soft Voting Ensemble]
+        RF -->|Probabilities| Ensemble
+    end
+
+    %% Deep Learning Path
+    subgraph 1D CNN Pathway
+        FoldGrid -->|Fixed-size grid: 201 points| Conv1D_1[Conv1D Layer 1 + BatchNorm]
+        Conv1D_1 --> MaxPool1[MaxPooling1D]
+        MaxPool1 --> Conv1D_2[Conv1D Layer 2 + BatchNorm]
+        Conv1D_2 --> MaxPool2[MaxPooling1D]
+        MaxPool2 --> Conv1D_3[Conv1D Layer 3 + BatchNorm]
+        Conv1D_3 --> GAP[Global Average Pooling]
+        GAP --> Dense1[Dense Classifier Head]
+        Dense1 --> Softmax[Softmax Probs]
+    end
+
+    %% Final Outputs
+    Ensemble -->|Consensus Probability| Decider[Candidate Vetting Manager]
+    Softmax -->|Deep Confidence| Decider
+    Decider -->|Vetted Classes| TargetOutput[TRANSIT, ECLIPSE, BLEND, STELLAR_VAR, ARTIFACT]
+```
+
+### ML Pipeline Workflow Detail
+1. **Ensemble Branch**:
+   - Compiles a 14-dimensional feature vector containing geometric properties (depth, duration, odd-even mismatch ratio, secondary eclipse ratio, skewness, kurtosis, and period harmonics).
+   - XGBoost and Random Forest output calibrated probabilities which are soft-voted (60% weight on XGBoost, 40% on Random Forest) to output the classification.
+2. **1D CNN Branch**:
+   - The phase-folded flux is interpolated to a fixed grid of size 201.
+   - A sequential network of 3 Conv1D blocks extracts localized spatial dips and outputs a categorical distribution representing exoplanetary transits vs. stellar eclipses.
+
+---
+
 ## ⚙️ Core Modes of Operation
 
 The platform operates in two distinct modes configured via command-line arguments or environmental settings:
@@ -35,12 +79,10 @@ The platform operates in two distinct modes configured via command-line argument
 ### 1. 🧪 Synthetic Simulation Mode (`--mode synthetic`)
 * **Purpose**: Local pipeline validation, synthetic dataset generation, and model training.
 * **Mechanism**: Generates light curves programmatically. Models transit shapes via Batman, and injects realistic noise profiles (Gaussian noise, red noise, rotational variability, stellar flares, and instrument glitches).
-* **Ideal for**: Benchmarking classification accuracy, debugging, and training classifier checkpoints without dependency on network interfaces.
 
 ### 🔭 Real MAST Ingestion Mode (`--mode mast`)
 * **Purpose**: Production exoplanet discovery on real space telescope data.
-* **Mechanism**: Leverages the STScI MAST API cone searches to identify targets (e.g., TESS 2-minute cadence targets) based on coordinates or TIC ID, retrieves FITS arrays, and feeds the raw timeseries directly into the preprocessing engine.
-* **Ideal for**: Cross-referencing new exoplanet candidates against known NASA catalogs and scanning target sectors.
+* **Mechanism**: Leverages the STScI MAST API cone searches to identify targets based on coordinates or TIC ID, retrieves FITS arrays, and feeds the raw timeseries directly into the preprocessing engine.
 
 ---
 
