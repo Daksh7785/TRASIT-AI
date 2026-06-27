@@ -2,6 +2,7 @@
 Planetary Habitability and Classification Estimator
 Estimates planet size, orbital characteristics, equilibrium temperature,
 stellar irradiation, and habitability zone boundaries.
+Updated for v2.0 production release with precise Keplerian calculation models.
 """
 import numpy as np
 from typing import Dict
