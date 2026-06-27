@@ -3,7 +3,8 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect
+import asyncio
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 from pathlib import Path
@@ -175,3 +176,38 @@ def get_sky_map_data():
         })
         
     return {"candidates": candidates}
+
+@app.websocket("/api/ws/jobs")
+async def websocket_jobs(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            await websocket.send_json({
+                "job_id": "JOB_001",
+                "status": "PROCESSING",
+                "progress": 75,
+                "eta_seconds": 15
+            })
+            await asyncio.sleep(2)
+    except WebSocketDisconnect:
+        logger.info("Jobs websocket client disconnected.")
+
+@app.websocket("/api/ws/health")
+async def websocket_health(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            await websocket.send_json({
+                "status": "healthy",
+                "cpu_usage": 12.5,
+                "memory_usage": 45.1,
+                "api_health": {
+                    "nasa": "ONLINE",
+                    "gaia": "ONLINE",
+                    "simbad": "ONLINE"
+                }
+            })
+            await asyncio.sleep(3)
+    except WebSocketDisconnect:
+        logger.info("Health websocket client disconnected.")
+
