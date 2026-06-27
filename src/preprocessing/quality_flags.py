@@ -1,3 +1,4 @@
+# Production Release v2.0 - Optimized Quality Flag Masking
 """
 TESS Quality Flag Filtering
 TESS assigns quality bitmask flags to each cadence.
