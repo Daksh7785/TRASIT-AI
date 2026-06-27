@@ -1,6 +1,7 @@
 """
 Cross-Matching Module
 Cross-matches candidate parameters (Period, Coordinates) against the NASA Exoplanet Archive and ExoFOP.
+Integrates TAP online database catalog searches.
 """
 import requests
 import pandas as pd
