@@ -1,3 +1,4 @@
+# Production Release v2.0 - 1D Convolutional Neural Network
 """
 1D Convolutional Neural Network Classifier
 Operates directly on phase-folded light curve segments.
