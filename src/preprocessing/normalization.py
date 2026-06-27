@@ -1,3 +1,4 @@
+# Production Release v2.0 - Optimized Normalization Pipeline
 """
 Flux Normalization Methods
 Multiple strategies for TESS light curve normalization.
