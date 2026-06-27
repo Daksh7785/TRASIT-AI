@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  transit-ai:
+    build: .
+    container_name: transit-ai-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+    environment:
+      - USE_SYNTHETIC_FALLBACK=true
+      - MAX_LIGHTCURVES=200
+    restart: unless-stopped
+    
+  pipeline:
+    build: .
+    container_name: transit-ai-pipeline
+    command: python -m src.pipeline.full_pipeline --mode synthetic --n-lcs 500
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./reports:/app/reports
+    depends_on:
+      - transit-ai
+    profiles: ["run"]
