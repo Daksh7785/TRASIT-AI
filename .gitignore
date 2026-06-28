@@ -6,12 +6,9 @@ __pycache__/
 .pytest_cache/
 logs/
 reports/
-data/raw/
-data/processed/
-data/synthetic/
-data/training/
-data/results/
-models/
+data/
+data_test/
+outputs/
 
 # Node
 node_modules/
