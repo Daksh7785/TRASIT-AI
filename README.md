@@ -6,9 +6,22 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/FastAPI-0.100+-green.svg?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
-  <img src="https://img.shields.io/badge/Streamlit-1.28+-red.svg?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/React-18+-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/Netlify-Deployed-00C7B7.svg?style=for-the-badge&logo=netlify&logoColor=white" alt="Netlify">
+  <img src="https://img.shields.io/badge/Render-Deployed-46E3B7.svg?style=for-the-badge&logo=render&logoColor=white" alt="Render">
   <img src="https://img.shields.io/badge/Docker-Ready-blue.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
 </p>
+
+---
+
+## 🌐 Live Cloud Deployments
+
+The entire TRANSIT-AI fullstack platform is deployed and fully operational in the cloud:
+
+* **✨ Live Frontend Web App (Netlify):** [https://agent-6a40dc484c04e8674efd2c4d--transitai.netlify.app/](https://agent-6a40dc484c04e8674efd2c4d--transitai.netlify.app/)
+* **🚀 Live FastAPI Backend & AI Services (Render):** [https://trasit-ai-1.onrender.com](https://trasit-ai-1.onrender.com)
+  * *Health Check Endpoint:* [`/health`](https://trasit-ai-1.onrender.com/health)
+  * *OpenAPI Documentation:* [`/docs`](https://trasit-ai-1.onrender.com/docs)
 
 ---
 
@@ -90,6 +103,12 @@ The platform operates in two distinct modes configured via command-line argument
 
 ```
 TRASIT-AI/
+├── frontend/                  # React + Vite fullstack UI dashboard
+│   ├── src/
+│   │   ├── components/        # Interactive astronomical visualizers & panels
+│   │   ├── hooks/             # Custom API connection hooks
+│   │   └── App.tsx            # Main application root
+│   └── package.json           # Frontend dependencies
 ├── app/
 │   ├── api/
 │   │   ├── main.py            # FastAPI REST endpoints
