@@ -19,7 +19,7 @@ from src.acquisition.synthetic_generator import (
     generate_demo_science_batch, generate_training_dataset
 )
 from src.preprocessing.detrending import preprocess_lightcurve
-from src.detection.tls_detector import run_tls
+from src.detection.ensemble_detector import run_ensemble_detector
 from src.classification.feature_extractor import extract_features
 from src.classification.ml_classifier import TransitClassifier
 from src.fitting.batman_fitter import fit_transit
@@ -89,7 +89,7 @@ class TransitAIPipeline:
                 return result
             
             # Step 2: Detect
-            detection = run_tls(time_c, flux_c, flux_err_c)
+            detection = run_ensemble_detector(time_c, flux_c, flux_err_c)
             result["detection"] = detection
             
             # Step 3: Feature extraction
