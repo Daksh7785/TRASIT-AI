@@ -1,0 +1,15 @@
+std_flux
+skew_flux
+kurt_flux
+p2p_scatter
+period
+duration
+depth
+snr
+sde
+std_in
+std_out
+in_out_std_ratio
+odd_even_diff
+sec_depth_ratio
+asymmetry
